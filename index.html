@@ -6,7 +6,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-image: url('https://thumbs.dreamstime.com/z/bees-cartoon-pattern-seamless-vector-flat-background-doodle-94703360.jpg'); /* Replace with your desired background */
+            background-image: url('/img/beehive.jpg'); /* Replace with your desired background */
             background-size: cover;
             color: white;
         }
@@ -55,7 +55,6 @@
             .then(response => response.json())
             .then(data => {
                   if (data.results && data.results.length > 0) {
-
                         document.getElementById('image').src = data.results[0].urls.small;
                       }
                 })
