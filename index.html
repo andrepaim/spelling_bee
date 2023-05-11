@@ -80,7 +80,7 @@
         }
 
         // Fetch word list from file
-        fetch('words.txt')
+        fetch('https://andrepaim.github.io/spelling_bee.txt/words.txt')
             .then(response => response.text())
             .then(data => {
                 words = data.split('\n').filter(word => word); // Split by newline and remove any empty lines
