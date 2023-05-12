@@ -7,7 +7,7 @@
 body {
   background-image: url('img/beehive.jpg');
   background-size: cover;
-  color: white;
+  color: black;
 }
 
 .center-screen {
@@ -51,6 +51,8 @@ body {
           </div>
           <!-- Modal body -->
           <div class="modal-body">
+            <h2 id="translation" class="text-center"></h2>
+            <p id="phrase" class="text-center"></p>
             <img id="image" src="" alt="Random word illustration" class="img-fluid rounded" />
           </div>
         </div>
@@ -64,58 +66,68 @@ body {
       const unsplashAccessKey = 'nwYN-xIYjdl8G6a3bCV98VMHgofp5XlAKCOx-lG63tE'; // Replace with your Unsplash access key
 
       function speak(text) {
-              let msg = new SpeechSynthesisUtterance(text);
-              msg.lang = 'en-US';
-              msg.rate = 0.6;
-              msg.pitch = 1;
-              msg.volume = 1;
-              window.speechSynthesis.speak(msg);
-            }
+        let msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.6;
+        msg.pitch = 1;
+        msg.volume = 1;
+        window.speechSynthesis.speak(msg);
+      }
 
       function fetchImage(query) {
-              fetch(`https://api.unsplash.com/search/photos?query=${query}&client_id=${unsplashAccessKey}`)
-                .then(response => response.json())
-                .then(data => {
-                        if (data.results && data.results.length > 0) {
-                                document.getElementById('image').src = data.results[0].urls.small;
-                              }
-                      })
-                .catch(error => console.error(error));
+        fetch(`https://api.unsplash.com/search/photos?query=${query}&client_id=${unsplashAccessKey}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.results && data.results.length > 0) {
+              document.getElementById('image')
+              .src = data.results[0].urls.small;
             }
+          })
+          .catch(error => console.error(error));
+      }
 
       function toggleWordVisibility() {
-              let wordElement = document.getElementById('word');
-              if (wordElement.style.display === 'none') {
-                      wordElement.style.display = 'block';
-                    } else {
-                            wordElement.style.display = 'none';
-                          }
-            }
+        let wordElement = document.getElementById('word');
+        if (wordElement.style.display === 'none') {
+          wordElement.style.display = 'block';
+        } else {
+          wordElement.style.display = 'none';
+        }
+      }
 
       function newWord() {
-              if (words.length > 0) {
-                      let randomWord = words[Math.floor(Math.random() * words.length)];
-                      let wordElement = document.getElementById('word');
-                      wordElement.innerText = randomWord;
-                      wordElement.style.display = 'none'; // hide the word
-                      speak(randomWord);
-                      fetchImage(randomWord);
-                    }
-            }
+        if (words.length > 0) {
+          let randomWord = words[Math.floor(Math.random() * words.length)];
+          let wordElement = document.getElementById('word');
+          wordElement.innerText = randomWord.word;
+          wordElement.style.display = 'none'; // hide the word
+          speak(randomWord.word);
+          fetchImage(randomWord.phrase);
+          document.getElementById('translation').innerText = randomWord.translation;
+          document.getElementById('phrase').innerText = randomWord.phrase;
+        }
+      }
 
       function playWordAgain() {
-              let wordElement = document.getElementById('word');
-              wordElement.style.display = 'none'; // hide the word
-              speak(wordElement.innerText);
-            }
+        let wordElement = document.getElementById('word');
+        wordElement.style.display = 'none'; // hide the word
+        speak(wordElement.innerText);
+      }
 
       // Fetch word list from file
-      fetch('https://andrepaim.github.io/spelling_bee/words.txt')
+      fetch('https://andrepaim.github.io/spelling_bee/data.csv')
         .then(response => response.text())
         .then(data => {
-                words = data.split('\n').filter(word => word); // Split by newline and remove any empty lines
-                newWord(); // Fetch a new word after the word list has loaded
-              })
+          words = data.split('\n').filter(word => word).map(word => {
+            let parts = word.split(',');
+            return {
+              word: parts[0],
+              translation: parts[1],
+              phrase: parts[2]
+            };
+          }); // Split by newline, remove any empty lines, and map to objects
+          newWord(); // Fetch a new word after the word list has loaded
+        })
         .catch(error => console.error(error));
 
       document.getElementById('toggleBtn').addEventListener('click', toggleWordVisibility);
@@ -124,5 +136,3 @@ body {
     </script>
   </body>
 </html>
-
-
