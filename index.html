@@ -65,6 +65,7 @@ body {
 
       function speak(text) {
               let msg = new SpeechSynthesisUtterance(text);
+              msg.rate = 0.5;
               window.speechSynthesis.speak(msg);
             }
 
