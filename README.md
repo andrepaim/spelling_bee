@@ -1,6 +1,8 @@
 # Spelling Bee Trainer
 
-Welcome to the Spelling Bee Trainer! This is a simple web app designed to help my son prepare for his school spelling competition. 
+Welcome to the Spelling Bee Trainer! 
+
+This is a very simple web app designed to help my son prepare for his school spelling competition. 
 
 The Spelling Bee Trainer uses a list of words provided by the school.
 
