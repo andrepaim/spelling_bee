@@ -104,7 +104,7 @@ body {
           speak(randomWord.word);
           fetchImage(randomWord.phrase);
           document.getElementById('translation').innerText = randomWord.translation;
-          document.getElementById('phrase').innerText = randomWord.phrase;
+          document.getElementById('phrase').innerText = replaceWordWithXs(randomWord.phrase, randomWord.word);
         }
       }
 
@@ -113,6 +113,13 @@ body {
         wordElement.style.display = 'none'; // hide the word
         speak(wordElement.innerText);
       }
+
+        function replaceWordWithXs(phrase, word) {
+            let regex = new RegExp(word, "gi");
+            let xs = 'X'.repeat(word.length);
+            let newPhrase = phrase.replace(regex, xs);
+            return newPhrase;
+        }
 
       // Fetch word list from file
       fetch('https://andrepaim.github.io/spelling_bee/data.csv')
