@@ -1,37 +1,39 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Spelling Bee</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
-body {
-  background-image: url('img/beehive.jpg');
-  background-size: cover;
-  color: black;
-}
+      body {
+        background-image: url('img/beehive.jpg');
+        background-size: cover;
+        color: black;
+      }
 
-.btn {
-  border-radius: 5px; /* adjust this value as needed */
-}
-.center-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
+      .btn {
+        border-radius: 5px; /* adjust this value as needed */
+      }
 
-.shadow-text {
-  color: yellow;
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-}
+      .center-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
 
-#image {
-  max-width: 90%;
-  height: auto;
-  border-radius: 20px;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-}
+      .shadow-text {
+        color: yellow;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+      }
+
+      #image {
+        max-width: 90%;
+        height: auto;
+        border-radius: 20px;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+      }
     </style>
   </head>
   <body>
@@ -67,6 +69,14 @@ body {
     <script>
       let words = [];
       const unsplashAccessKey = 'nwYN-xIYjdl8G6a3bCV98VMHgofp5XlAKCOx-lG63tE'; // Replace with your Unsplash access key
+      let voices = [];
+
+      function loadVoices() {
+        voices = window.speechSynthesis.getVoices();
+        // Choose a specific voice here if you want, for example:
+         let selectedVoice = voices.find(voice => voice.name === 'Google US English');
+         if (selectedVoice) { defaultVoice = selectedVoice; }
+      }
 
       function speak(text) {
         let msg = new SpeechSynthesisUtterance(text);
@@ -74,6 +84,8 @@ body {
         msg.rate = 0.6;
         msg.pitch = 1;
         msg.volume = 1;
+        // Choose the first voice available or a specific voice
+        msg.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
         window.speechSynthesis.speak(msg);
       }
 
@@ -82,8 +94,7 @@ body {
           .then(response => response.json())
           .then(data => {
             if (data.results && data.results.length > 0) {
-              document.getElementById('image')
-              .src = data.results[0].urls.small;
+              document.getElementById('image').src = data.results[0].urls.small;
             }
           })
           .catch(error => console.error(error));
@@ -117,12 +128,12 @@ body {
         speak(wordElement.innerText);
       }
 
-        function replaceWordWithXs(phrase, word) {
-            let regex = new RegExp(word, "gi");
-            let xs = 'X'.repeat(word.length);
-            let newPhrase = phrase.replace(regex, xs);
-            return newPhrase;
-        }
+      function replaceWordWithXs(phrase, word) {
+        let regex = new RegExp(word, "gi");
+        let xs = 'X'.repeat(word.length);
+        let newPhrase = phrase.replace(regex, xs);
+        return newPhrase;
+      }
 
       // Fetch word list from file
       fetch('https://andrepaim.github.io/spelling_bee/data.csv')
@@ -142,7 +153,11 @@ body {
 
       document.getElementById('toggleBtn').addEventListener('click', toggleWordVisibility);
       document.getElementById('newWordBtn').addEventListener('click', newWord);
-      document.getElementById('playAgainBtn').addEventListener('click', playWordAgain); // Add event listener to the "Jogar Novamente" button
+      document.getElementById('playAgainBtn').addEventListener('click', playWordAgain);
+
+      window.speechSynthesis.onvoiceschanged = loadVoices; // Load voices when they become available
+      loadVoices(); // Initial load
     </script>
   </body>
 </html>
+
