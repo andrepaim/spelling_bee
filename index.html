@@ -89,7 +89,7 @@
       }
 
       function fetchImage(word) {
-        let imageUrl = `img/${word}.png`;
+        let imageUrl = `img/${word.toLowerCase()}.png`;
         document.getElementById('image').src = imageUrl;
       }
 
