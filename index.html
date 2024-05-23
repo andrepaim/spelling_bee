@@ -64,12 +64,13 @@
     <h1 class="shadow-text">Spelling Bee</h1>
     <button id="newWordBtn" class="btn btn-warning m-2">New Word</button>
     <button id="playAgainBtn" class="btn btn-warning m-2">Play Again</button>
-    <button id="toggleBtn" class="btn btn-warning m-2">Show/Hide the Word</button>
     <button type="button" class="btn btn-warning m-2" data-toggle="modal" data-target="#imageModal">Hint</button>
     <button id="startRecognitionBtn" class="btn btn-warning m-2">Start Recognition</button>
+    <button id="toggleBtn" class="btn btn-warning m-2">Show/Hide the Word</button>
+    <div id="result" class="h2 shadow-text mt-3"></div>
     <div id="word" class="h2 shadow-text"></div>
     <div id="spinner"></div>
-    <div id="result" class="h2 shadow-text mt-3"></div>
+    <div id="answer"></div>
   </div>
 
   <!-- The Modal -->
@@ -95,6 +96,7 @@
   <script>
     let words = [];
     let voices = [];
+    var defaultVoice
 
     function loadVoices() {
       voices = window.speechSynthesis.getVoices();
@@ -105,10 +107,15 @@
     function speak(text) {
       let msg = new SpeechSynthesisUtterance(text);
       msg.lang = 'en-US';
-      msg.rate = 0.6;
+      msg.rate = 0.4;
       msg.pitch = 1;
       msg.volume = 1;
-      msg.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+      if (defaultVoice) { 
+        msg.voice = defaultVoice; 
+      } // use the default voice (Google US English) if available
+      else {
+        msg.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+      }
       window.speechSynthesis.speak(msg);
     }
 
@@ -130,10 +137,13 @@
       if (words.length > 0) {
         let randomWord = words[Math.floor(Math.random() * words.length)];
         let wordElement = document.getElementById('word');
-        wordElement.innerText = randomWord.word;
+        wordElement.innerText = 'Answer: ' + randomWord.word;
         wordElement.style.display = 'none'; // hide the word
         let resultElement = document.getElementById('result');
         resultElement.style.display = 'none'; // hide the result
+        let answerElement = document.getElementById('answer');
+        answerElement.innerText = randomWord.word;
+        answerElement.style.display = 'none'; // hide the answer
         speak(randomWord.word);
         fetchImage(randomWord.word);
         document.getElementById('translation').innerText = randomWord.translation;
@@ -142,9 +152,9 @@
     }
 
     function playWordAgain() {
-      let wordElement = document.getElementById('word');
-      wordElement.style.display = 'none'; // hide the word
-      speak(wordElement.innerText);
+      let answerElement = document.getElementById('answer');
+      answerElement.style.display = 'none'; // hide the word
+      speak(answerElement.innerText);
     }
 
     function replaceWordWithXs(phrase, word) {
@@ -196,7 +206,7 @@
       var transcript = event.results[0][0].transcript;
       let resultElement = document.getElementById('result');
       resultElement.style.display = 'block';
-      resultElement.innerText = 'Transcribed text: ' + transcript;
+      resultElement.innerText = 'Your speech: ' + transcript.toUpperCase();
     };
 
     recognition.onerror = function (event) {
