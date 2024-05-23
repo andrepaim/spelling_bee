@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "notebooks"
+version = "0.1.0"
+description = ""
+authors = ["None"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.26.4"
+torch = "^2.3.0"
+torchvision = "^0.18.0"
+transformers = "^4.41.1"
+accelerate = "^0.30.1"
+pandas = "^2.2.2"
+matplotlib = "^3.9.0"
+
+[tool.poetry.dev-dependencies]
+ipykernel = "^6.29.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
