@@ -64,13 +64,14 @@
     <h1 class="shadow-text">Spelling Bee</h1>
     <button id="newWordBtn" class="btn btn-warning m-2">New Word</button>
     <button id="playAgainBtn" class="btn btn-warning m-2">Play Again</button>
-    <button type="button" class="btn btn-warning m-2" data-toggle="modal" data-target="#imageModal">Hint</button>
+    <button id="showHintDialogBtn" type="button" class="btn btn-warning m-2" data-toggle="modal" data-target="#imageModal">Hint</button>
     <button id="startRecognitionBtn" class="btn btn-warning m-2">Start Recognition</button>
     <button id="toggleBtn" class="btn btn-warning m-2">Show/Hide the Word</button>
     <div id="result" class="h2 shadow-text mt-3"></div>
     <div id="word" class="h2 shadow-text"></div>
     <div id="spinner"></div>
     <div id="answer"></div>
+    <div id="hint"></div>
   </div>
 
   <!-- The Modal -->
@@ -143,6 +144,9 @@
         resultElement.style.display = 'none'; // hide the result
         let answerElement = document.getElementById('answer');
         answerElement.innerText = randomWord.word;
+        let hintElement = document.getElementById('hint');
+        hintElement.style.display = 'none'; // hide the result
+        hintElement.innerText = randomWord.phrase;
         answerElement.style.display = 'none'; // hide the answer
         speak(randomWord.word);
         fetchImage(randomWord.word);
@@ -155,6 +159,12 @@
       let answerElement = document.getElementById('answer');
       answerElement.style.display = 'none'; // hide the word
       speak(answerElement.innerText);
+    }
+
+    function playHintPhrase() {
+      let hitElement = document.getElementById('hint');
+      hitElement.style.display = 'none'; // hide the word
+      speak(hitElement.innerText);
     }
 
     function replaceWordWithXs(phrase, word) {
@@ -197,6 +207,7 @@
     document.getElementById('newWordBtn').addEventListener('click', newWord);
     document.getElementById('playAgainBtn').addEventListener('click', playWordAgain);
     document.getElementById('startRecognitionBtn').addEventListener('click', startRecognition);
+    document.getElementById('showHintDialogBtn').addEventListener('click', playHintPhrase);
 
     window.speechSynthesis.onvoiceschanged = loadVoices;
     loadVoices();
