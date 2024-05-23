@@ -1,156 +1,188 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Spelling Bee</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-      body {
-        background-image: url('img/beehive.jpg');
-        background-size: cover;
-        color: black;
-      }
 
-      .btn {
-        border-radius: 5px; /* adjust this value as needed */
-      }
+<head>
+  <title>Spelling Bee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-image: url('img/beehive.jpg');
+      background-size: cover;
+      color: black;
+    }
 
-      .center-screen {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-      }
+    .btn {
+      border-radius: 5px;
+      /* adjust this value as needed */
+    }
 
-      .shadow-text {
-        color: yellow;
-        text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-      }
+    .center-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
 
-      #image {
-        max-width: 90%;
-        height: auto;
-        border-radius: 20px;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="center-screen text-center">
-      <h1 class="shadow-text">Spelling Bee</h1>
-      <button id="newWordBtn" class="btn btn-warning m-2">Nova Palavra</button>
-      <button id="playAgainBtn" class="btn btn-warning m-2">Tocar Novamente</button>
-      <button id="toggleBtn" class="btn btn-warning m-2">Mostre/Esconda a Palavra</button>
-      <button type="button" class="btn btn-warning m-2" data-toggle="modal" data-target="#imageModal">Dica</button>
-      <div id="word" class="h2 shadow-text"></div>
-    </div>
+    .shadow-text {
+      color: yellow;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
 
-    <!-- The Modal -->
-    <div class="modal fade" id="imageModal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <!-- Modal body -->
-          <div class="modal-body">
-            <h2 id="translation" class="text-center"></h2>
-            <p id="phrase" class="text-center"></p>
-            <img id="image" src="" alt="Random word illustration" class="img-fluid rounded" />
-          </div>
+    #image {
+      max-width: 90%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="center-screen text-center">
+    <h1 class="shadow-text">Spelling Bee</h1>
+    <button id="newWordBtn" class="btn btn-warning m-2">New Word</button>
+    <button id="playAgainBtn" class="btn btn-warning m-2">Play Again</button>
+    <button id="toggleBtn" class="btn btn-warning m-2">Show/Hide the Word</button>
+    <button type="button" class="btn btn-warning m-2" data-toggle="modal" data-target="#imageModal">Hint</button>
+    <button id="startRecognitionBtn" class="btn btn-warning m-2">Start Recognition</button>
+    <div id="word" class="h2 shadow-text"></div>
+    <div id="result" class="h4 mt-3"></div>
+  </div>
+
+  <!-- The Modal -->
+  <div class="modal fade" id="imageModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <h2 id="translation" class="text-center"></h2>
+          <p id="phrase" class="text-center"></p>
+          <img id="image" src="" alt="Random word illustration" class="img-fluid rounded" />
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script>
-      let words = [];
-      let voices = [];
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script>
+    let words = [];
+    let voices = [];
 
-      function loadVoices() {
-        voices = window.speechSynthesis.getVoices();
-        // Choose a specific voice here if you want, for example:
-         let selectedVoice = voices.find(voice => voice.name === 'Google US English');
-         if (selectedVoice) { defaultVoice = selectedVoice; }
+    function loadVoices() {
+      voices = window.speechSynthesis.getVoices();
+      // Choose a specific voice here if you want, for example:
+      let selectedVoice = voices.find(voice => voice.name === 'Google US English');
+      if (selectedVoice) { defaultVoice = selectedVoice; }
+    }
+
+    function speak(text) {
+      let msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'en-US';
+      msg.rate = 0.6;
+      msg.pitch = 1;
+      msg.volume = 1;
+      // Choose the first voice available or a specific voice
+      msg.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+      window.speechSynthesis.speak(msg);
+    }
+
+    function fetchImage(word) {
+      let imageUrl = `img/${word.toLowerCase()}.png`;
+      document.getElementById('image').src = imageUrl;
+    }
+
+    function toggleWordVisibility() {
+      let wordElement = document.getElementById('word');
+      if (wordElement.style.display === 'none') {
+        wordElement.style.display = 'block';
+      } else {
+        wordElement.style.display = 'none';
       }
+    }
 
-      function speak(text) {
-        let msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'en-US';
-        msg.rate = 0.6;
-        msg.pitch = 1;
-        msg.volume = 1;
-        // Choose the first voice available or a specific voice
-        msg.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
-        window.speechSynthesis.speak(msg);
-      }
-
-      function fetchImage(word) {
-        let imageUrl = `img/${word.toLowerCase()}.png`;
-        document.getElementById('image').src = imageUrl;
-      }
-
-      function toggleWordVisibility() {
+    function newWord() {
+      if (words.length > 0) {
+        let randomWord = words[Math.floor(Math.random() * words.length)];
         let wordElement = document.getElementById('word');
-        if (wordElement.style.display === 'none') {
-          wordElement.style.display = 'block';
-        } else {
-          wordElement.style.display = 'none';
-        }
-      }
-
-      function newWord() {
-        if (words.length > 0) {
-          let randomWord = words[Math.floor(Math.random() * words.length)];
-          let wordElement = document.getElementById('word');
-          wordElement.innerText = randomWord.word;
-          wordElement.style.display = 'none'; // hide the word
-          speak(randomWord.word);
-          fetchImage(randomWord.word);
-          document.getElementById('translation').innerText = randomWord.translation;
-          document.getElementById('phrase').innerText = replaceWordWithXs(randomWord.phrase, randomWord.word);
-        }
-      }
-
-      function playWordAgain() {
-        let wordElement = document.getElementById('word');
+        wordElement.innerText = randomWord.word;
         wordElement.style.display = 'none'; // hide the word
-        speak(wordElement.innerText);
+        speak(randomWord.word);
+        fetchImage(randomWord.word);
+        document.getElementById('translation').innerText = randomWord.translation;
+        document.getElementById('phrase').innerText = replaceWordWithXs(randomWord.phrase, randomWord.word);
       }
+    }
 
-      function replaceWordWithXs(phrase, word) {
-        let regex = new RegExp(word, "gi");
-        let xs = 'X'.repeat(word.length);
-        let newPhrase = phrase.replace(regex, xs);
-        return newPhrase;
-      }
+    function playWordAgain() {
+      let wordElement = document.getElementById('word');
+      wordElement.style.display = 'none'; // hide the word
+      speak(wordElement.innerText);
+    }
 
-      // Fetch word list from file
-      fetch('https://andrepaim.github.io/spelling_bee/data.csv')
-        .then(response => response.text())
-        .then(data => {
-          words = data.split('\n').filter(word => word).map(word => {
-            let parts = word.split(',');
-            return {
-              word: parts[0],
-              translation: parts[1],
-              phrase: parts[2]
-            };
-          }); // Split by newline, remove any empty lines, and map to objects
-          newWord(); // Fetch a new word after the word list has loaded
-        })
-        .catch(error => console.error(error));
+    function replaceWordWithXs(phrase, word) {
+      let regex = new RegExp(word, "gi");
+      let xs = 'X'.repeat(word.length);
+      let newPhrase = phrase.replace(regex, xs);
+      return newPhrase;
+    }
 
-      document.getElementById('toggleBtn').addEventListener('click', toggleWordVisibility);
-      document.getElementById('newWordBtn').addEventListener('click', newWord);
-      document.getElementById('playAgainBtn').addEventListener('click', playWordAgain);
+    function startRecognition() {
+      recognition.start();
+    }
 
-      window.speechSynthesis.onvoiceschanged = loadVoices; // Load voices when they become available
-      loadVoices(); // Initial load
-    </script>
-  </body>
+    if ('webkitSpeechRecognition' in window) {
+      var recognition = new webkitSpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+    } else {
+      alert('Speech recognition is not supported in this browser.');
+    }
+
+    // Fetch word list from file
+    fetch('https://andrepaim.github.io/spelling_bee/data.csv')
+      .then(response => response.text())
+      .then(data => {
+        words = data.split('\n').filter(word => word).map(word => {
+          let parts = word.split(',');
+          return {
+            word: parts[0],
+            translation: parts[1],
+            phrase: parts[2]
+          };
+        }); // Split by newline, remove any empty lines, and map to objects
+        newWord(); // Fetch a new word after the word list has loaded
+      })
+      .catch(error => console.error(error));
+
+    document.getElementById('toggleBtn').addEventListener('click', toggleWordVisibility);
+    document.getElementById('newWordBtn').addEventListener('click', newWord);
+    document.getElementById('playAgainBtn').addEventListener('click', playWordAgain);
+    document.getElementById('startRecognitionBtn').addEventListener('click', startRecognition);
+
+    window.speechSynthesis.onvoiceschanged = loadVoices; // Load voices when they become available
+    loadVoices(); // Initial load
+
+    recognition.onresult = function (event) {
+      var transcript = event.results[0][0].transcript;
+      document.getElementById('result').innerText = 'Transcribed text: ' + transcript;
+    };
+
+    recognition.onerror = function (event) {
+      document.getElementById('result').innerText = 'Speech recognition error: ' + event.error;
+    };
+
+    recognition.onend = function () {
+      console.log('Speech recognition ended.');
+    };
+  </script>
+</body>
+
 </html>
-
